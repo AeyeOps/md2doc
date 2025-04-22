@@ -1,12 +1,11 @@
  package main
 
  import (
-     "flag"
-     "fmt"
-     "os"
-     "os"
-     "os/exec"
-     "path/filepath"
+    "flag"
+    "fmt"
+    "os"
+    "os/exec"
+    "path/filepath"
  )
 
  func main() {
