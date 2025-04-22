@@ -1,7 +1,7 @@
 # 📝 md2docx
 
-![CI](https://github.com/aeolyus/md2doc/actions/workflows/ci.yml/badge.svg)
-![Release](https://github.com/aeolyus/md2doc/actions/workflows/release.yml/badge.svg)
+![CI](https://github.com/aeyeops/md2doc/actions/workflows/ci.yml/badge.svg)
+![Release](https://github.com/aeyeops/md2doc/actions/workflows/release.yml/badge.svg)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 > **From Markdown to Word in seconds** - A lightning-fast CLI converter built in under an hour!
@@ -50,7 +50,7 @@ sequenceDiagram
     participant Go
     participant System
     
-    User->>Go: go install github.com/yourusername/md2docx/cmd/md2docx@latest
+    User->>Go: go install github.com/aeyeops/md2doc/cmd/md2docx@latest
     Go->>System: Download and compile source
     Go->>System: Place binary in GOPATH/bin
     System-->>User: md2docx command available
@@ -58,15 +58,15 @@ sequenceDiagram
 
 Ensure you have Go installed (≥1.20) and that your `$GOPATH/bin` (Linux/macOS) or `%USERPROFILE%\go\bin` (Windows) is in your `PATH`, then run:
 ```bash
-go install github.com/yourusername/md2docx/cmd/md2docx@latest
+go install github.com/aeyeops/md2doc/cmd/md2docx@latest
 ```
 
 ### 2. Build from source
 
 Clone the repository and build locally:
 ```bash
-git clone https://github.com/yourusername/md2docx.git
-cd md2docx
+git clone https://github.com/aeyeops/md2doc.git
+cd md2doc
 go build -o md2docx ./cmd/md2docx
 ```
 For cross‑compiling to Windows on Linux/macOS:
@@ -77,7 +77,7 @@ Copy the resulting binary (`md2docx` or `md2docx.exe`) to a directory in your `P
 
 ### 3. Pre‑built binaries
 
-Download the latest release for your platform from the [GitHub Releases page](https://github.com/yourusername/md2docx/releases), extract it, and place the `md2docx` (or `md2docx.exe`) binary into a directory in your `PATH`.
+Download the latest release for your platform from the [GitHub Releases page](https://github.com/aeyeops/md2doc/releases), extract it, and place the `md2docx` (or `md2docx.exe`) binary into a directory in your `PATH`.
 
 ## 🚀 Usage
 
@@ -91,6 +91,15 @@ Options:
 - `-verbose`       : Enable verbose output
 
 The output file will be created next to the input file with the same base name and a `.docx` extension.
+
+## 📂 Examples
+
+We’ve included an [example Markdown file](examples/sample.md) demonstrating headings, lists, code blocks, and diagrams. To generate the corresponding Word document:
+```bash
+md2docx examples/sample.md
+# This produces examples/sample.docx alongside sample.md
+```
+Feel free to open the resulting `.docx` in Microsoft Word to inspect the formatting, page size (US Letter), and embedded diagram.
 
 ## 🖱️ Windows Shell Integration
 
