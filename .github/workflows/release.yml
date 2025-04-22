@@ -15,6 +15,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - name: Extract version
+        shell: bash
+        run: |
+          # Strip 'refs/tags/' prefix to get the version number
+          VERSION=${GITHUB_REF#refs/tags/}
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
@@ -24,7 +30,6 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y pandoc
       - name: Build binaries
         run: |
-          VERSION=${GITHUB_REF#refs/tags/}
           TARGETS=("linux_amd64" "windows_amd64" "darwin_amd64")
           for target in "${TARGETS[@]}"; do
             os=${target%%_*}
@@ -85,30 +90,30 @@ jobs:
         uses: actions/upload-release-asset@v1
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: release/md2docx_${{ github.ref_name }}_amd64.deb
-          asset_name: md2docx_${{ github.ref_name }}_amd64.deb
+          asset_path: release/md2docx_${{ env.VERSION }}_amd64.deb
+          asset_name: md2docx_${{ env.VERSION }}_amd64.deb
           asset_content_type: application/vnd.debian.binary-package
 
       - name: Upload macOS tarball
         uses: actions/upload-release-asset@v1
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: release/md2docx_${{ github.ref_name }}_darwin_amd64.tar.gz
-          asset_name: md2docx_${{ github.ref_name }}_darwin_amd64.tar.gz
+          asset_path: release/md2docx_${{ env.VERSION }}_darwin_amd64.tar.gz
+          asset_name: md2docx_${{ env.VERSION }}_darwin_amd64.tar.gz
           asset_content_type: application/gzip
 
       - name: Upload Windows zip
         uses: actions/upload-release-asset@v1
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: release/md2docx_${{ github.ref_name }}_windows_amd64.zip
-          asset_name: md2docx_${{ github.ref_name }}_windows_amd64.zip
+          asset_path: release/md2docx_${{ env.VERSION }}_windows_amd64.zip
+          asset_name: md2docx_${{ env.VERSION }}_windows_amd64.zip
           asset_content_type: application/zip
 
       - name: Upload Windows installer
         uses: actions/upload-release-asset@v1
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: release/md2docx-${{ github.ref_name }}-installer.exe
-          asset_name: md2docx-${{ github.ref_name }}-installer.exe
+          asset_path: release/md2docx-${{ env.VERSION }}-installer.exe
+          asset_name: md2docx-${{ env.VERSION }}-installer.exe
           asset_content_type: application/octet-stream
