@@ -1,7 +1,7 @@
 # 📝 md2docx
 
-![CI](https://github.com/aeyeops/md2doc/actions/workflows/ci.yml/badge.svg)
-![Release](https://github.com/aeyeops/md2doc/actions/workflows/release.yml/badge.svg)
+[![CI](https://github.com/aeyeops/md2doc/actions/workflows/ci.yml/badge.svg)](https://github.com/aeyeops/md2doc/actions/workflows/ci.yml)
+[![Release](https://github.com/aeyeops/md2doc/actions/workflows/release.yml/badge.svg)](https://github.com/aeyeops/md2doc/actions/workflows/release.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 > **From Markdown to Word in seconds** - A lightning-fast CLI converter built in under an hour!
@@ -77,7 +77,14 @@ Copy the resulting binary (`md2docx` or `md2docx.exe`) to a directory in your `P
 
 ### 3. Pre‑built binaries
 
-Download the latest release for your platform from the [GitHub Releases page](https://github.com/aeyeops/md2doc/releases), extract it, and place the `md2docx` (or `md2docx.exe`) binary into a directory in your `PATH`.
+Download the latest release for your platform from the [GitHub Releases page](https://github.com/AeyeOps/md2doc/releases), extract it, and place the `md2docx` (or `md2docx.exe`) binary into a directory in your `PATH`.
+
+### 4. Homebrew (macOS)
+
+Install via Homebrew from the included formula:
+```bash
+brew install --build-from-source ./packaging/homebrew/md2docx.rb
+```
 
 ## 🚀 Usage
 
@@ -100,6 +107,13 @@ md2docx examples/sample.md
 # This produces examples/sample.docx alongside sample.md
 ```
 Feel free to open the resulting `.docx` in Microsoft Word to inspect the formatting, page size (US Letter), and embedded diagram.
+
+## 📦 Packaging
+
+We provide installers and packages for easy installation via GitHub Releases:
+- **Windows**: NSIS installer (`md2docx-<version>-installer.exe`)
+- **Debian/Ubuntu**: `.deb` package (`md2docx_<version>_amd64.deb`)
+- **macOS**: Tarball (`md2docx_<version>_darwin_amd64.tar.gz`) and Homebrew formula
 
 ## 🖱️ Windows Shell Integration
 

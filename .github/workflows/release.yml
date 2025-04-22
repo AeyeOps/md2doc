@@ -31,12 +31,41 @@ jobs:
             if [ "$os" = "windows" ]; then ext=".exe"; fi
             GOOS=$os GOARCH=$arch go build -o md2docx_${VERSION}_${os}_${arch}${ext} ./cmd/md2docx
           done
-      - name: Package binaries
+      - name: Prepare release directory
+        run: mkdir -p release
+
+      - name: Package Debian (.deb)
         run: |
-          mkdir -p release
-          for bin in md2docx_*; do
-            zip -j "release/${bin}.zip" "$bin"
-          done
+          sudo apt-get update && sudo apt-get install -y dpkg-dev
+          mkdir -p pkgroot/usr/local/bin
+          cp md2docx_${VERSION}_linux_amd64 pkgroot/usr/local/bin/md2docx
+          cat > pkgroot/DEBIAN/control << EOF
+          Package: md2docx
+          Version: ${VERSION}
+          Section: utils
+          Priority: optional
+          Architecture: amd64
+          Maintainer: Your Name <you@example.com>
+          Description: Markdown to DOCX converter
+          EOF
+          dpkg-deb --build pkgroot md2docx_${VERSION}_amd64.deb
+          mv md2docx_${VERSION}_amd64.deb release/
+
+      - name: Package macOS Tarball
+        run: |
+          tar -czf release/md2docx_${VERSION}_darwin_amd64.tar.gz md2docx_${VERSION}_darwin_amd64
+
+      - name: Package Windows Tarball
+        run: |
+          zip -j release/md2docx_${VERSION}_windows_amd64.zip md2docx_${VERSION}_windows_amd64.exe
+
+      - name: Create Windows Installer (NSIS)
+        run: |
+          sudo apt-get install -y nsis
+          sed -e "s|\\$VERSION|${VERSION}|g" packaging/windows/installer.nsi > installer.nsi
+          cp md2docx_${VERSION}_windows_amd64.exe .
+          makensis installer.nsi
+          mv "md2docx-${VERSION}-installer.exe" release/
       - name: Create GitHub Release
         id: create_release
         uses: actions/create-release@v1
