@@ -1,9 +1,14 @@
 name: Release
+permissions:
+  contents: write
 
 on:
   push:
+    # Trigger on version tags
     tags:
       - 'v*.*.*'
+  # Allow manual triggering of release workflow
+  workflow_dispatch:
 
 jobs:
   release:
@@ -32,9 +37,24 @@ jobs:
           for bin in md2docx_*; do
             zip -j "release/${bin}.zip" "$bin"
           done
-      - name: Create GitHub Release and upload assets
-        uses: softprops/action-gh-release@v1
+      - name: Create GitHub Release
+        id: create_release
+        uses: actions/create-release@v1
         with:
-          files: release/*.zip
+          # Use the pushed tag name
+          tag_name: ${{ github.ref_name }}
+          release_name: ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install GitHub CLI
+        uses: actions/setup-gh-cli@v2
+
+      - name: Upload Release Assets
+        run: |
+          gh release upload ${{ github.ref_name }} release/*.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

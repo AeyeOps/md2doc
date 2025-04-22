@@ -1,7 +1,7 @@
 # 📝 md2docx
 
-![CI](https://github.com/yourusername/md2docx/actions/workflows/ci.yml/badge.svg)
-![Release](https://github.com/yourusername/md2docx/actions/workflows/release.yml/badge.svg)
+![CI](https://github.com/aeolyus/md2doc/actions/workflows/ci.yml/badge.svg)
+![Release](https://github.com/aeolyus/md2doc/actions/workflows/release.yml/badge.svg)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 > **From Markdown to Word in seconds** - A lightning-fast CLI converter built in under an hour!
@@ -131,12 +131,18 @@ graph TD
 ```
 
 - **CI**: Builds and tests on push/PR to `main` (Linux/macOS/Windows)
-- **Releases**: Tag a new version to trigger a release workflow that cross-compiles binaries, packages them, and uploads to GitHub Releases
+- **Releases**:
+  - On pushing a version tag matching `v*.*.*`, the release workflow:
+    1. Cross‑compiles Linux, Windows, and macOS binaries
+    2. Packages each into ZIP archives
+    3. Creates a GitHub Release with auto‑generated release notes
+    4. Uploads the ZIP assets to the release
+  - You can also manually trigger the release workflow via the **Run workflow** button under the Actions tab
 
 To publish a new release:
 ```bash
 git tag vX.Y.Z
-git push origin vX.Y.Z
+git push origin main --tags
 ```
 
 ## 👨‍💻 Contributing
