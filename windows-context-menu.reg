@@ -1,0 +1,7 @@
+ Windows Registry Editor Version 5.00
+
+ [HKEY_CLASSES_ROOT\SystemFileAssociations\.md\shell\Generate Word Document]
+ @="Generate Word Document"
+
+ [HKEY_CLASSES_ROOT\SystemFileAssociations\.md\shell\Generate Word Document\command]
+ @="\"md2docx\" \"%1\""

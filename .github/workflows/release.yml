@@ -1,0 +1,39 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: 1.20
+      - name: Build binaries
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/}
+          TARGETS=("linux_amd64" "windows_amd64" "darwin_amd64")
+          for target in "${TARGETS[@]}"; do
+            os=${target%%_*}
+            arch=${target##*_}
+            ext=""
+            if [ "$os" = "windows" ]; then ext=".exe"; fi
+            GOOS=$os GOARCH=$arch go build -o md2docx_${VERSION}_${os}_${arch}${ext} ./cmd/md2docx
+          done
+      - name: Package binaries
+        run: |
+          mkdir -p release
+          for bin in md2docx_*; do
+            zip -j "release/${bin}.zip" "$bin"
+          done
+      - name: Create GitHub Release and upload assets
+        uses: softprops/action-gh-release@v1
+        with:
+          files: release/*.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

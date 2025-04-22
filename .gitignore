@@ -1,0 +1,12 @@
+ # .gitignore for md2docx project
+ # Go binaries
+ *.exe
+ *.dll
+ *.so
+ *.dylib
+ *.test
+ # Go vendor directory
+ vendor/
+ # Node modules and lock files
+ node_modules/
+ package-lock.json
