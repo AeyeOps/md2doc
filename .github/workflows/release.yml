@@ -1,6 +1,7 @@
 name: Release
 permissions:
   contents: write
+  id-token: none
 
 on:
   push:
@@ -9,27 +10,39 @@ on:
       - 'v*.*.*'
   # Allow manual triggering of release workflow
   workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (tag)'
+        required: false
+        default: ''
 
 jobs:
   release:
     runs-on: ubuntu-latest
+    env:
+      # Determine version: Use release tag, workflow input, or git ref name
+      VERSION: ${{ (github.event_name == 'release' && github.event.release.tag_name) || (github.event_name == 'workflow_dispatch' && github.event.inputs.version != '' && github.event.inputs.version) || github.ref_name }}
     steps:
-      - uses: actions/checkout@v3
-      - name: Set up Go
-        uses: actions/setup-go@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
         with:
-          # Quote version to preserve string and avoid YAML float parsing
-          go-version: "1.20"
+          fetch-depth: 0 # Fetch all history for release notes generation
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.20" # Keep specific version for now
+          cache: true # Enable Go module caching
+
       - name: Build binaries
         run: |
-          VERSION=${GITHUB_REF#refs/tags/}
           TARGETS=("linux_amd64" "windows_amd64" "darwin_amd64")
           for target in "${TARGETS[@]}"; do
             os=${target%%_*}
             arch=${target##*_}
             ext=""
             if [ "$os" = "windows" ]; then ext=".exe"; fi
-            GOOS=$os GOARCH=$arch go build -o md2docx_${VERSION}_${os}_${arch}${ext} ./cmd/md2docx
+            GOOS=$os GOARCH=$arch go build -o md2docx-${VERSION}-${os}-${arch}${ext} ./cmd/md2docx
           done
       - name: Prepare release directory
         run: mkdir -p release
@@ -38,7 +51,7 @@ jobs:
         run: |
           sudo apt-get update && sudo apt-get install -y dpkg-dev
           mkdir -p pkgroot/usr/local/bin
-          cp md2docx_${VERSION}_linux_amd64 pkgroot/usr/local/bin/md2docx
+          cp md2docx-${VERSION}-linux-amd64 pkgroot/usr/local/bin/md2docx
           cat > pkgroot/DEBIAN/control << EOF
           Package: md2docx
           Version: ${VERSION}
@@ -49,64 +62,33 @@ jobs:
           Description: Markdown to DOCX converter
           EOF
           dpkg-deb --build pkgroot md2docx_${VERSION}_amd64.deb
-          mv md2docx_${VERSION}_amd64.deb release/
+          mv md2docx_${VERSION}_amd64.deb release/md2docx-${VERSION}-linux-amd64.deb
 
       - name: Package macOS Tarball
         run: |
-          tar -czf release/md2docx_${VERSION}_darwin_amd64.tar.gz md2docx_${VERSION}_darwin_amd64
+          tar -czf release/md2docx-${VERSION}-darwin-amd64.tar.gz md2docx-${VERSION}-darwin-amd64
 
       - name: Package Windows Tarball
         run: |
-          zip -j release/md2docx_${VERSION}_windows_amd64.zip md2docx_${VERSION}_windows_amd64.exe
+          zip -j release/md2docx-${VERSION}-windows-amd64.zip md2docx-${VERSION}-windows-amd64.exe
 
       - name: Create Windows Installer (NSIS)
         run: |
           sudo apt-get install -y nsis
-          sed -e "s|\\$VERSION|${VERSION}|g" packaging/windows/installer.nsi > installer.nsi
-          cp md2docx_${VERSION}_windows_amd64.exe .
+          sed -e "s|\${VERSION}|${VERSION}|g" packaging/windows/installer.nsi > installer.nsi
+          cp md2docx-${VERSION}-windows-amd64.exe .
           makensis installer.nsi
           mv "md2docx-${VERSION}-installer.exe" release/
-      - name: Create GitHub Release
-        id: create_release
-        uses: actions/create-release@v1
+      - name: Generate checksums
+        run: |
+          sha256sum release/* > release/checksums.txt
+
+      - name: Create Release and Upload Assets
+        uses: softprops/action-gh-release@v1
         with:
-          # Use the pushed tag name
-          tag_name: ${{ github.ref_name }}
-          release_name: ${{ github.ref_name }}
-          draft: false
-          prerelease: false
+          tag_name: ${{ env.VERSION }} # Use the determined version
+          name: Release ${{ env.VERSION }}
           generate_release_notes: true
+          files: release/* # Upload all files from the release directory
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Upload Debian package
-        uses: actions/upload-release-asset@v1
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: release/md2docx_${{ github.ref_name }}_amd64.deb
-          asset_name: md2docx_${{ github.ref_name }}_amd64.deb
-          asset_content_type: application/vnd.debian.binary-package
-
-      - name: Upload macOS tarball
-        uses: actions/upload-release-asset@v1
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: release/md2docx_${{ github.ref_name }}_darwin_amd64.tar.gz
-          asset_name: md2docx_${{ github.ref_name }}_darwin_amd64.tar.gz
-          asset_content_type: application/gzip
-
-      - name: Upload Windows zip
-        uses: actions/upload-release-asset@v1
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: release/md2docx_${{ github.ref_name }}_windows_amd64.zip
-          asset_name: md2docx_${{ github.ref_name }}_windows_amd64.zip
-          asset_content_type: application/zip
-
-      - name: Upload Windows installer
-        uses: actions/upload-release-asset@v1
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: release/md2docx-${{ github.ref_name }}-installer.exe
-          asset_name: md2docx-${{ github.ref_name }}-installer.exe
-          asset_content_type: application/octet-stream
