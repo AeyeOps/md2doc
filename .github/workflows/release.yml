@@ -55,6 +55,7 @@ jobs:
         run: |
           sudo apt-get update && sudo apt-get install -y dpkg-dev
           mkdir -p pkgroot/usr/local/bin
+          mkdir -p pkgroot/DEBIAN # Create the DEBIAN directory
           cp md2docx-${VERSION}-linux-amd64 pkgroot/usr/local/bin/md2docx
           cat > pkgroot/DEBIAN/control << EOF
           Package: md2docx
