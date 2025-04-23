@@ -2,40 +2,34 @@
 
 ## Current Focus
 
-The immediate priority is to **fix the broken GitHub Actions release workflow (`release.yml`)**. All recent attempts to create releases using this workflow have failed.
+The task to **populate the Knowledge Base (KB) with Azure CLI reference documentation has been stopped** by the user. The next focus should be addressing the issues with the GitHub Actions `release.yml` workflow.
 
-## Problem Diagnosis
+## Azure CLI KB Task Details
 
-Analysis of the workflow file (`release.yml`), execution logs (`gh run view 14605935691 --log`), and supporting documents (`codex.md`, `KB/08-github-actions-version-audit.md`) revealed the following key issues:
-
-1.  **Faulty Version Extraction:** The mechanism `VERSION=${GITHUB_REF#refs/tags/}` is unreliable and produces an empty string, causing downstream filename errors (e.g., `md2docx__linux_amd64`) and packaging failures.
-2.  **Outdated/Archived Actions:** The workflow uses:
-    *   `actions/checkout@v3` (Latest: `v4`)
-    *   `actions/setup-go@v4` (Latest: `v5`)
-    *   `actions/create-release@v1` (Potentially outdated)
-    *   `actions/upload-release-asset@v1` (**Archived/Unmaintained**)
-
-## Action Plan
-
-The agreed-upon plan to fix `release.yml` involves the following steps:
-
-1.  **Refactor Version Handling:**
-    *   Remove the shell-based `VERSION=${GITHUB_REF#refs/tags/}` line.
-    *   Use `${{ github.ref_name }}` to get the version from tag pushes.
-    *   Add a `workflow_dispatch` input named `version` for manual runs.
-    *   Implement logic to select the correct version source based on the trigger event (`github.event_name`).
-2.  **Update Actions:**
-    *   Change `actions/checkout@v3` to `actions/checkout@v4`.
-    *   Change `actions/setup-go@v4` to `actions/setup-go@v5`.
-    *   Replace `actions/create-release@v1` and all `actions/upload-release-asset@v1` steps with `softprops/action-gh-release@v1`.
-3.  **Standardize Asset Naming & Upload:**
-    *   Ensure all build, packaging, and upload steps consistently use the correctly determined version variable.
-    *   Configure `softprops/action-gh-release@v1` to upload all desired artifacts (`.deb`, `.zip`, `.tar.gz`, installer) using glob patterns.
-4.  **Add Manual Trigger Input:**
-    *   Define the `version` input within the `on.workflow_dispatch.inputs` section.
+-   **Goal:** Fetch Azure CLI reference documentation and store it in the project's Knowledge Base (`KB/`).
+-   **Source:** Microsoft Learn, starting from the A-Z index (`https://learn.microsoft.com/en-us/cli/azure/reference-index?view=azure-cli-latest`).
+-   **Method:** Use the `firecrawl_scrape` tool to fetch content as Markdown, focusing on the main content area of each command group's page.
+-   **Structure:** Create a dedicated subdirectory `KB/azure-cli/` and store one Markdown file per top-level command group (e.g., `KB/azure-cli/vm.md`, `KB/azure-cli/storage.md`).
+-   **Status (as of stopping):**
+    -   Directory `KB/azure-cli/` created.
+    -   The following command group files were fetched and saved before stopping:
+        -   `KB/azure-cli/acat.md`
+        -   `KB/azure-cli/account.md`
+        -   `KB/azure-cli/acr.md`
+        -   `KB/azure-cli/ad.md`
+        -   `KB/azure-cli/advisor.md`
+        -   `KB/azure-cli/afd.md`
+        -   `KB/azure-cli/ai-examples.md`
+        -   `KB/azure-cli/aks.md`
+        -   `KB/azure-cli/aksarc.md`
+        -   `KB/azure-cli/akshybrid.md`
+        -   `KB/azure-cli/alerts-management.md`
+        -   `KB/azure-cli/alias.md`
+        -   `KB/azure-cli/amlfs.md`
+        -   `KB/azure-cli/ams.md`
+        -   `KB/azure-cli/aosm.md`
+    -   The process was stopped after saving `KB/azure-cli/aosm.md`.
 
 ## Next Steps
 
--   Implement the planned changes to `.github/workflows/release.yml` using the `replace_in_file` tool.
--   Trigger the updated workflow (e.g., push a test tag) to verify the fix.
--   Inspect the generated release and artifacts for correctness.
+-   **Fix `release.yml` Workflow:** Address the previously identified issues with the GitHub Actions `release.yml` workflow (faulty version extraction, outdated actions). This is now the primary focus.

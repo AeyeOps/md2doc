@@ -7,7 +7,8 @@
 -   CI workflow (`ci.yml`) is mostly stable, successfully building and testing on Linux, macOS, and Windows.
 -   Packaging scripts for Debian (`.deb`), macOS (`.tar.gz`), Windows (`.zip`), and NSIS installer exist within the `release.yml` workflow.
 -   A Knowledge Base (`KB/`) exists documenting GitHub Actions concepts and project-specific workflows.
--   A Memory Bank (`memory-bank/`) has been initialized.
+-   **Knowledge Base population with Azure CLI documentation was stopped.** A dedicated subdirectory (`KB/azure-cli/`) has been created, and the following command group files were fetched and saved before stopping: `acat`, `account`, `acr`, `ad`, `advisor`, `afd`, `ai-examples`, `aks`, `aksarc`, `akshybrid`, `alerts-management`, `alias`, `amlfs`, `ams`, `aosm`.
+-   A Memory Bank (`memory-bank/`) has been initialized and is being actively maintained.
 
 ## What Works
 
@@ -16,9 +17,11 @@
 -   Cross-platform builds via CI (`ci.yml`).
 -   Windows shell integration via `.reg` file.
 -   Installation via `go install` and building from source.
+-   Initial setup and partial population of the Azure CLI Knowledge Base within `KB/azure-cli/` (task stopped).
 
 ## Known Issues / What's Left
 
+-   **Azure CLI KB Population Stopped:** The task to fetch and save all Azure CLI command group documentation was stopped by the user.
 -   **Release Workflow (`release.yml`) is Broken:**
     -   **All recent release attempts have failed.**
     -   **Root Cause:** Incorrect version string extraction (`VERSION=${GITHUB_REF#refs/tags/}` results in empty string), leading to errors in packaging steps (e.g., `cp: cannot stat 'md2docx__linux_amd64'`).
@@ -37,3 +40,4 @@
     -   Standardize asset naming using the correct version variable.
 2.  **Test the Fixed Release Workflow:** Trigger a release (e.g., by pushing a test tag) and verify successful execution and artifact generation.
 3.  **Verify Release Assets:** Download and inspect the generated packages (`.deb`, `.zip`, `.tar.gz`, installer) to ensure they are correct.
+4.  **(Paused) Azure CLI KB Population:** The task to populate the KB is currently stopped. It can be resumed later if needed.
