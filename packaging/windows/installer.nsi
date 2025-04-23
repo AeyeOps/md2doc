@@ -7,7 +7,7 @@ Page instfiles
 
 Section "Install md2docx"
     SetOutPath "$INSTDIR"
-    File "md2docx_${VERSION}_windows_amd64.exe"
+    File "md2docx-${VERSION}-windows-amd64.exe"
     CreateShortCut "$DESKTOP\\md2docx.lnk" "$INSTDIR\\md2docx.exe"
 SectionEnd
 
