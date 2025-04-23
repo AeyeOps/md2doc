@@ -83,7 +83,7 @@ jobs:
         run: |
           sudo apt-get install -y nsis
           sed -e "s|\${VERSION}|${VERSION}|g" packaging/windows/installer.nsi > installer.nsi
-          cp md2docx-${VERSION}-windows-amd64.exe .
+          # The executable is already in the current directory from the build step
           makensis installer.nsi
           mv "md2docx-${VERSION}-installer.exe" release/
       - name: Generate checksums
